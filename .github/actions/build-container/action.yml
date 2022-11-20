@@ -49,7 +49,7 @@ runs:
         OCI_LOCAL_TAG: "localhost/container:tmp"
       run: |
         eval "${{ inputs.container_input }}"
-        ./build-container.sh
+        ./container-ci/build-container.sh
 
     - name: container.publish
       shell: sh
