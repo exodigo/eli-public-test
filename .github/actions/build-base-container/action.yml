@@ -34,7 +34,7 @@ runs:
 
     - name: generate.tags
       id: tags
-      uses: exodigo/eli-public-test/.github/actions/generate_tags@master
+      uses: exodigo/eli-public-test/.github/actions/generate-tags@master
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: latest
