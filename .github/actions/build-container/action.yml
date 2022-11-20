@@ -31,6 +31,17 @@ runs:
         done
         pip config set global.extra-index-url https://pypi.python.org/simple/
 
+    - name: extract.oidc
+      uses: exodigo/exodigo_github-action-oidc@v1
+      id: oidc
+
+    - name: checkout.container-ci
+      uses: actions/checkout@v3
+      with:
+        path: container-ci
+        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
+        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+
     - name: container.build
       shell: sh
       env:
@@ -38,18 +49,7 @@ runs:
         OCI_LOCAL_TAG: "localhost/container:tmp"
       run: |
         eval "${{ inputs.container_input }}"
-        eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
-        exec ${OCI_ENGINE} image build \
-          --secret id=pip_secret,src="${HOME}/.config/pip/pip.conf" \
-          --build-arg pip_creds=".config/pip/pip.conf" \
-          --secret id=twine_secret,src="${HOME}/.pypirc" \
-          --build-arg twine_creds=".pypirc" \
-          --secret id=npm_secret,src="${HOME}/.npmrc" \
-          --build-arg npm_creds=".npmrc" \
-          "${@}" \
-          --file Containerfile \
-          --tag ${OCI_LOCAL_TAG} \
-          .
+        ./build-container.sh
 
     - name: container.publish
       shell: sh
