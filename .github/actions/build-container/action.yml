@@ -21,6 +21,8 @@ runs:
 
     - name: config.tools
       shell: sh
+      env:
+        OCI_ENGINE: podman
       run: |
         for tool in pip twine npm; do
           aws codeartifact login \
@@ -30,6 +32,7 @@ runs:
               --tool "${tool}"
         done
         pip config set global.extra-index-url https://pypi.python.org/simple/
+        aws ecr get-login-password --region "${AWS_ROLE_REGION}" | ${OCI_ENGINE} login --username AWS --password-stdin "${AWS_ECR_NAME}"
 
     - name: container.build
       shell: sh
@@ -38,15 +41,14 @@ runs:
         OCI_LOCAL_TAG: "localhost/container:tmp"
       run: |
         eval "${{ inputs.container_input }}"
-        "${{ github.action_path }}/build-container.sh"
 
+        "${{ github.action_path }}/build-container.sh"
     - name: container.publish
       shell: sh
       env:
         OCI_ENGINE: podman
         OCI_LOCAL_TAG: "localhost/container:tmp"
       run: |
-        aws ecr get-login-password --region "${AWS_ROLE_REGION}" | podman login --username AWS --password-stdin "${AWS_ECR_NAME}"
         container_tags="${{ inputs.container_tags }}"
         for container_tag in ${container_tags}; do
           ${OCI_ENGINE} tag "${OCI_LOCAL_TAG}" "${container_tag}"
