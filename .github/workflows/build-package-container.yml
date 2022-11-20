@@ -21,7 +21,7 @@ on:
         default: ""
 
 jobs:
-  generate_tags:
+  build:
     permissions:
       actions: read
       contents: read
@@ -49,17 +49,10 @@ jobs:
           tag_names: ${{ inputs.package_version }} ${{ inputs.stable_version }}
           secrets: ${{ toJSON(secrets) }}
 
-  build:
-    needs:
-      - generate_tags
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-    secrets: inherit
-    uses: ./.github/workflows/build-container.yml
-    with:
-      container_tags: ${{ needs.generate_tags.outputs.tags }}
-      container_input: |
-        OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.package_name }}"
-        OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.package_version }}"
+      - name: container.build
+        uses: ./.github/actions/build-container
+        with:
+          container_tags: ${{ steps.tags.output.tags }}
+          container_input: |
+            OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.package_name }}"
+            OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.package_version }}"

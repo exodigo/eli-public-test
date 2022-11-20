@@ -13,16 +13,12 @@ on:
         default: ""
 
 jobs:
-  generate_tags:
+  build:
     permissions:
       actions: read
       contents: read
       id-token: write
     runs-on: ubuntu-22.04
-
-    outputs:
-      temp_tag: ${{ steps.tags.outputs.temp_tag }}
-      tags: ${{ steps.tags.outputs.tags }}
 
     steps:
       - name: checkout
@@ -41,15 +37,8 @@ jobs:
           tag_names: latest
           secrets: ${{ toJSON(secrets) }}
 
-  build:
-    needs:
-      - generate_tags
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-    secrets: inherit
-    uses: ./.github/workflows/build-container.yml
-    with:
-      container_tags: ${{ needs.generate_tags.outputs.tags }}
-      container_input: ${{ inputs.container_input }}
+      - name: container.build
+        uses: ./.github/actions/build-container
+        with:
+          container_tags: ${{ steps.tags.outputs.tags }}
+          container_input: ${{ inputs.container_input }}
