@@ -28,14 +28,14 @@ jobs:
 
       - name: generate.tags
         id: tags
-        uses: ./.github/actions/generate-tags
+        uses: exodigo/eli-public-test/.github/workflows/generate-tags.yml@master
         with:
           container_name: ${{ inputs.container_name }}
           tag_names: latest
           secrets: ${{ toJSON(secrets) }}
 
       - name: container.build
-        uses: ./.github/actions/build-container
+        uses: exodigo/eli-public-test/.github/workflows/build-container.yml@master
         with:
           container_tags: ${{ steps.tags.outputs.tags }}
           container_input: ${{ inputs.container_input }}
