@@ -33,9 +33,6 @@ jobs:
       tags: ${{ steps.tags.outputs.tags }}
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
       - name: apply.environment
         uses: exodigo/exodigo_ci_actions_apply-environment@s1
         with:

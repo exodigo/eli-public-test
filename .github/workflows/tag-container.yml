@@ -24,10 +24,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
-      - name: extract.oidc
-        uses: exodigo/exodigo_github-action-oidc@v1
-        id: oidc
-
       - name: config.aws
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
