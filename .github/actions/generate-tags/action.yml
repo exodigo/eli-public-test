@@ -8,8 +8,6 @@ inputs:
   tag_names:
     description: Tag names to generate tags for
     default: ""
-  secrets:
-    description: Secrets toJSON
 outputs:
   temp_tag:
     description: Temporary tag for current run
@@ -21,14 +19,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: checkout.environments
-      uses: actions/checkout@v3
-      with:
-        token: ${{ fromJSON(inputs.secrets).EXODIGO_GITHUB_ENVIRONMENT_PAT }}
-        path: environments
-        repository: exodigo/exodigo_ci_environments
-        ref: master
-
     - name: set.tags
       id: tags
       shell: sh

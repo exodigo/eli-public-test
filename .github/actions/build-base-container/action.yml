@@ -14,8 +14,6 @@ inputs:
   publish:
     description: Whether or not to publish the container (The temporary tag is published regardless)
     default: "true"
-  secrets:
-    description: Secrets toJSON
 outputs:
   temp_tag:
     description: The temporary tag given to the container
@@ -27,18 +25,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: apply.environment
-      uses: exodigo/exodigo_ci_actions_apply-environment@s1
-      with:
-        secrets: ${{ inputs.secrets }}
-
     - name: generate.tags
       id: tags
       uses: exodigo/eli-public-test/.github/actions/generate-tags@master
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: latest
-        secrets: ${{ inputs.secrets }}
 
     - name: container.build
       if: ${{ inputs.publish == 'false' }}
