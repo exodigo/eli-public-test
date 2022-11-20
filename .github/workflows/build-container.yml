@@ -1,0 +1,71 @@
+name: build-container
+
+on:
+  workflow_call:
+    inputs:
+      container_tags:
+        description: The container tags to publish
+        type: string
+        required: true
+      container_input:
+        description: Input for Containerfile
+        type: string
+        default: ""
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      OCI_ENGINE: podman
+      OCI_LOCAL_TAG: "localhost/container:tmp"
+
+    steps:
+      - name: apply.environment
+        uses: exodigo/exodigo_ci_actions_apply-environment@s1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: config.aws
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: ${{ env.AWS_ROLE_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+
+      - name: config.tools
+        run: |
+          for tool in pip twine npm; do
+            aws codeartifact login \
+                --region "${AWS_CODEARTIFACT_REGION}" \
+                --domain exodigo-ci \
+                --repository exodigo-ci \
+                --tool "${tool}"
+          done
+          pip config set global.extra-index-url https://pypi.python.org/simple/
+
+      - name: container.build
+        run: |
+          eval "${{ inputs.container_input }}"
+          eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
+          exec ${OCI_ENGINE} image build \
+            --secret id=pip_secret,src="${HOME}/.config/pip/pip.conf" \
+            --build-arg pip_creds=".config/pip/pip.conf" \
+            --secret id=twine_secret,src="${HOME}/.pypirc" \
+            --build-arg twine_creds=".pypirc" \
+            --secret id=npm_secret,src="${HOME}/.npmrc" \
+            --build-arg npm_creds=".npmrc" \
+            "${@}" \
+            --file Containerfile \
+            --tag ${OCI_LOCAL_TAG} \
+            .
+
+      - name: container.publish
+        run: |
+          aws ecr get-login-password --region "${AWS_ROLE_REGION}" | podman login --username AWS --password-stdin "${AWS_ECR_NAME}"
+          container_tags="${{ inputs.container_tags }}"
+          for container_tag in ${container_tags}; do
+            ${OCI_ENGINE} tag "${OCI_LOCAL_TAG}" "${container_tag}"
+            ${OCI_ENGINE} push "${container_tag}"
+          done

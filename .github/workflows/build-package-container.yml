@@ -1,0 +1,65 @@
+name: build-package-container
+
+on:
+  workflow_call:
+    inputs:
+      container_name:
+        description: The name of the container to build
+        type: string
+        required: true
+      package_name:
+        description: The name of the package
+        type: string
+        required: true
+      package_version:
+        description: The version of the package
+        type: string
+        required: true
+      stable_version:
+        description: The stable version of the package.
+        type: string
+        default: ""
+
+jobs:
+  generate_tags:
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    runs-on: ubuntu-22.04
+
+    outputs:
+      temp_tag: ${{ steps.tags.outputs.temp_tag }}
+      tags: ${{ steps.tags.outputs.tags }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: apply.environment
+        uses: exodigo/exodigo_ci_actions_apply-environment@s1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: generate.tags
+        id: tags
+        uses: ./.github/actions/generate-tags
+        with:
+          container_name: ${{ inputs.container_name }}
+          tag_names: ${{ inputs.package_version }} ${{ inputs.stable_version }}
+          secrets: ${{ toJSON(secrets) }}
+
+  build:
+    needs:
+      - generate_tags
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    secrets: inherit
+    uses: ./.github/workflows/build-container.yml
+    with:
+      container_tags: ${{ needs.generate_tags.outputs.tags }}
+      container_input: |
+        OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.package_name }}"
+        OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.package_version }}"

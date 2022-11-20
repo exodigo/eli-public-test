@@ -1,0 +1,46 @@
+name: 'generate-tags'
+description: 'Generate container tags for later usage'
+
+inputs:
+  container_name:
+    description: The name of the container to generate a tag for
+    required: true
+  tag_names:
+    description: Tag names to generate tags for
+    default: ""
+  secrets:
+    description: Secrets toJSON
+outputs:
+  temp_tag:
+    description: Temporary tag for current run
+    value: ${{ steps.tags.outputs.temp_tag }}
+  tags:
+    description: The generated tags
+    value: ${{ steps.tags.outputs.tags }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: checkout.environments
+      uses: actions/checkout@v3
+      with:
+        token: ${{ fromJSON(inputs.secrets).EXODIGO_GITHUB_ENVIRONMENT_PAT }}
+        path: environments
+        repository: exodigo/exodigo_ci_environments
+        ref: master
+
+    - name: set.tags
+      id: tags
+      shell: sh
+      env:
+        FULL_CONTAINER_NAME: ${{ env.AWS_ECR_NAME }}/exodigo-ci/${{ inputs.container_name }}
+      run: |
+        if [ -z "${{ inputs.tag_names}}" ]; then
+          tags=""
+        else
+          tags="$(printf "${FULL_CONTAINER_NAME}:%s " ${{ inputs.tag_names }})"
+        fi
+        cat >> "${GITHUB_OUTPUT}" << __EOF__
+        temp_tag=${FULL_CONTAINER_NAME}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+        tags=${tags}
+        __EOF__
