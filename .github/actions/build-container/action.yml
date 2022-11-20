@@ -41,6 +41,7 @@ runs:
       run: |
         eval "${{ inputs.container_input }}"
         eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
+        ls -R
         exec ${OCI_ENGINE} image build \
           --secret id=pip_secret,src="${HOME}/.config/pip/pip.conf" \
           --build-arg pip_creds=".config/pip/pip.conf" \
