@@ -26,16 +26,27 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
+      - name: extract.oidc
+        uses: exodigo/exodigo_github-action-oidc@v1
+        id: oidc
+
+      - name: checkout.eli-public-test
+        uses: actions/checkout@v3
+        with:
+          path: eli-public-test
+          repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
+          ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+
       - name: generate.tags
         id: tags
-        uses: exodigo/eli-public-test/.github/workflows/generate-tags.yml@master
+        uses: ./eli-public-test/.github/actions/generate-tags
         with:
           container_name: ${{ inputs.container_name }}
           tag_names: latest
           secrets: ${{ toJSON(secrets) }}
 
       - name: container.build
-        uses: exodigo/eli-public-test/.github/workflows/build-container.yml@master
+        uses: ./eli-public-test/.github/actions/build-container
         with:
-          container_tags: ${{ steps.tags.outputs.tags }}
+          container_tags: ${{ steps.tags.outputs.temp_tag }}
           container_input: ${{ inputs.container_input }}
