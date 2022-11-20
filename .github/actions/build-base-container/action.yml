@@ -34,7 +34,7 @@ runs:
 
     - name: generate.tags
       id: tags
-      uses: exodigo/eli-public-test/.github/actions/generate_tags@{{ github.action_ref }}
+      uses: exodigo/eli-public-test/.github/actions/generate_tags@master
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: latest
@@ -49,7 +49,7 @@ runs:
 
     - name: container.build_and_publish
       if: ${{ inputs.publish == 'true' }}
-      uses: exodigo/eli-public-test/.github/actions/build-container@{{ github.action_ref }}
+      uses: exodigo/eli-public-test/.github/actions/build-container@master
       with:
         container_tags: ${{ steps.tags.outputs.temp_tag }} ${{ steps.tags.outputs.tags }}
         container_input: ${{ inputs.container_input }}
