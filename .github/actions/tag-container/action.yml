@@ -1,0 +1,38 @@
+name: 'tag-container'
+description: 'Add tags to a container'
+
+inputs:
+  container:
+    description: The container to tag
+    required: true
+  tags:
+    description: The tags to add for the container
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+  - name: apply.environment
+    uses: exodigo/exodigo_ci_actions_apply-environment@s1
+    with:
+      secrets: ${{ toJSON(secrets) }}
+
+  - name: config.aws
+    uses: aws-actions/configure-aws-credentials@v1-node16
+    with:
+      aws-region: ${{ env.AWS_ROLE_REGION }}
+      role-to-assume: ${{ env.AWS_ROLE_ARN }}
+      mask-aws-account-id: 'no'
+
+  - name: container.publish
+    shell: sh
+    env:
+      OCI_ENGINE: podman
+    run: |
+      aws ecr get-login-password --region "${AWS_ROLE_REGION}" | podman login --username AWS --password-stdin "${AWS_ECR_NAME}"
+      ${OCI_ENGINE} pull "${{ inputs.container }}"
+      tags="${{ inputs.tags }}"
+      for t in ${tags}; do
+        ${OCI_ENGINE} tag "${{ inputs.container }}" "${t}"
+        ${OCI_ENGINE} push "${t}"
+      done

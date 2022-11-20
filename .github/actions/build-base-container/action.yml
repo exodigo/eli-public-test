@@ -1,0 +1,64 @@
+name: 'build-base-container'
+description: 'Build and publish a basic container'
+
+inputs:
+  container_name:
+    description: The name of the container
+    required: true
+  tag_names:
+    description: Tag names to generate tags for
+    default: ""
+  container_input:
+    description: Input for Containerfile
+    default: ""
+  publish:
+    description: Whether or not to publish the container (The temporary tag is published regardless)
+    default: "true"
+outputs:
+  temp_tag:
+    description: The temporary tag given to the container
+    value: '${{ steps.tags.outputs.temp_tag }}'
+  tags:
+    description: The tags created for the container
+    value: '${{ steps.tags.outputs.tags }}'
+
+runs:
+  using: "composite"
+  steps:
+    - name: apply.environment
+      uses: exodigo/exodigo_ci_actions_apply-environment@s1
+      with:
+        secrets: ${{ toJSON(secrets) }}
+
+    - name: extract.oidc
+      uses: exodigo/exodigo_github-action-oidc@v1
+      id: oidc
+
+    - name: checkout.eli-public-test
+      uses: actions/checkout@v3
+      with:
+        path: eli-public-test
+        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
+        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+
+    - name: generate.tags
+      id: tags
+      uses: ./eli-public-test/.github/actions/generate-tags
+      with:
+        container_name: ${{ inputs.container_name }}
+        tag_names: latest
+        secrets: ${{ toJSON(secrets) }}
+
+    - name: container.build
+      if: ${{ inputs.publish == 'false' }}
+      uses: ./eli-public-test/.github/actions/build-container
+      with:
+        container_tags: ${{ steps.tags.outputs.temp_tag }}
+        container_input: ${{ inputs.container_input }}
+
+    - name: container.build_and_publish
+      if: ${{ inputs.publish == 'true' }}
+      uses: ./eli-public-test/.github/actions/build-container
+      with:
+        container_tags: ${{ steps.tags.outputs.temp_tag }} ${{ steps.tags.outputs.tags }}
+        container_input: ${{ inputs.container_input }}
