@@ -8,6 +8,8 @@ inputs:
   tags:
     description: The tags to add for the container
     default: ""
+ secrets:
+    description: Secrets toJSON
 
 runs:
   using: "composite"
@@ -15,7 +17,7 @@ runs:
   - name: apply.environment
     uses: exodigo/exodigo_ci_actions_apply-environment@s1
     with:
-      secrets: ${{ toJSON(secrets) }}
+      secrets: ${{ inputs.secrets }}
 
   - name: config.aws
     uses: aws-actions/configure-aws-credentials@v1-node16
