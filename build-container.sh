@@ -7,7 +7,7 @@ die() {
 }
 
 OCI_ENGINE="${OCI_ENGINE:-podman}"
-OCI_LOCAL_TAG="${OCI_ENGINE:-localhost/container:tmp}"
+OCI_LOCAL_TAG="${OCI_LOCAL_TAG:-"localhost/container:tmp"}"
 
 eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
 exec ${OCI_ENGINE} image build \
