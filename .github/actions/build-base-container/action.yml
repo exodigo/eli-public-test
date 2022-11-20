@@ -32,20 +32,9 @@ runs:
       with:
         secrets: ${{ inputs.secrets }}
 
-    - name: extract.oidc
-      uses: exodigo/exodigo_github-action-oidc@v1
-      id: oidc
-
-    - name: checkout.eli-public-test
-      uses: actions/checkout@v3
-      with:
-        path: eli-public-test
-        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
-        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
-
     - name: generate.tags
       id: tags
-      uses: ./eli-public-test/.github/actions/generate-tags
+      uses: exodigo/eli-public-test/.github/actions/generate_tags@{{ github.action_ref }}
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: latest
@@ -60,7 +49,7 @@ runs:
 
     - name: container.build_and_publish
       if: ${{ inputs.publish == 'true' }}
-      uses: ./eli-public-test/.github/actions/build-container
+      uses: exodigo/eli-public-test/.github/actions/build-container@{{ github.action_ref }}
       with:
         container_tags: ${{ steps.tags.outputs.temp_tag }} ${{ steps.tags.outputs.tags }}
         container_input: ${{ inputs.container_input }}
