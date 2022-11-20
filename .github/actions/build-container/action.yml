@@ -17,6 +17,7 @@ runs:
       with:
         aws-region: ${{ env.AWS_ROLE_REGION }}
         role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        mask-aws-account-id: 'no'
 
     - name: config.tools
       shell: sh
