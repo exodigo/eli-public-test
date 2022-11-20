@@ -49,6 +49,9 @@ jobs:
           repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
           ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
 
+      - name: show.files
+        run: ls -R eli-public-test/.github
+
       - name: generate.tags
         id: tags
         uses: ./eli-public-test/.github/actions/generate-tags
