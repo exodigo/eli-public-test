@@ -42,7 +42,7 @@ runs:
 
     - name: container.build
       if: ${{ inputs.publish == 'false' }}
-      uses: ./eli-public-test/.github/actions/build-container
+      uses: exodigo/eli-public-test/.github/actions/build-container@master
       with:
         container_tags: ${{ steps.tags.outputs.temp_tag }}
         container_input: ${{ inputs.container_input }}

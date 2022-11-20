@@ -31,17 +31,6 @@ runs:
         done
         pip config set global.extra-index-url https://pypi.python.org/simple/
 
-    - name: extract.oidc
-      uses: exodigo/exodigo_github-action-oidc@v1
-      id: oidc
-
-    - name: checkout.container-ci
-      uses: actions/checkout@v3
-      with:
-        path: container-ci
-        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
-        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
-
     - name: container.build
       shell: sh
       env:
