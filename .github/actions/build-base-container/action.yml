@@ -50,6 +50,7 @@ runs:
       uses: exodigo/eli-public-test/.github/actions/tag-container@master
       with:
         container: ${{ steps.tags.outputs.temp_tag }}
+        is_local: true
         tags: ${{ steps.tags.outputs.temp_tag }}
 
     - name: container.publish.all
