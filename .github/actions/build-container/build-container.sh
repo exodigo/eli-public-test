@@ -5,6 +5,7 @@ OCI_CONTAINER_FILE="${OCI_CONTAINER_FILE:-Containerfile}"
 
 echo "aaaaaa"
 echo "bbbbb: ${OCI_ARG_LOCAL_TAG}"
+echo "ccccc: ${OCI_ARG_DIST}"
 
 eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
 exec ${OCI_ENGINE} image build \
