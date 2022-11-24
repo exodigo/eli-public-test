@@ -2,6 +2,9 @@ name: 'env'
 description: 'Setup environment, credentials, and common tools'
 
 inputs:
+  extra-apt-packages:
+    description: Extra apt packages to install
+    default: ""
   secrets:
     description: Secrets toJSON
 
