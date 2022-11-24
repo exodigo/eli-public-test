@@ -1,0 +1,34 @@
+name: 'env'
+description: 'Setup environment, credentials, and common tools'
+
+inputs:
+  secrets:
+    description: Secrets toJSON
+
+runs:
+  using: "composite"
+  steps:
+    - name: apply.environment
+      uses: exodigo/exodigo_ci_actions_apply-environment@s1
+      with:
+        secrets: ${{ inputs.secrets }}
+
+    - name: config.aws
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ env.AWS_ROLE_REGION }}
+        role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        mask-aws-account-id: 'no'
+
+    - name: config.tools
+      shell: sh
+      run: |
+        for tool in pip twine npm; do
+          aws codeartifact login \
+              --region "${AWS_CODEARTIFACT_REGION}" \
+              --domain exodigo-ci \
+              --repository exodigo-ci \
+              --tool "${tool}"
+        done
+        pip config set global.extra-index-url https://pypi.python.org/simple/
+        aws ecr get-login-password --region "${AWS_ROLE_REGION}" | ${OCI_ENGINE} login --username AWS --password-stdin "${AWS_ECR_NAME}"

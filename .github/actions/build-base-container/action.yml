@@ -8,6 +8,9 @@ inputs:
   tag_names:
     description: Tag names to generate tags for
     default: ""
+  container_file:
+    description: Path to the Containerfile
+    required: true
   container_input:
     description: Input for Containerfile
     default: ""
@@ -33,15 +36,21 @@ runs:
         tag_names: latest
 
     - name: container.build
-      if: ${{ inputs.publish == 'false' }}
       uses: exodigo/eli-public-test/.github/actions/build-container@master
       with:
-        container_tags: ${{ steps.tags.outputs.temp_tag }}
+        container_file: ${{ inputs.container_file }}
+        container_tag: ${{ steps.tags.outputs.temp_tag }}
         container_input: ${{ inputs.container_input }}
 
-    - name: container.build_and_publish
-      if: ${{ inputs.publish == 'true' }}
-      uses: exodigo/eli-public-test/.github/actions/build-container@master
+    - name: container.publish.temp
+      uses: exodigo/eli-public-test/.github/actions/tag-container@master
       with:
-        container_tags: ${{ steps.tags.outputs.temp_tag }} ${{ steps.tags.outputs.tags }}
-        container_input: ${{ inputs.container_input }}
+        container: ${{ steps.tags.outputs.temp_tag }}
+        tags: ${{ steps.tags.outputs.temp_tag }}
+
+    - name: container.publish.all
+      if: ${{ inputs.publish == 'true' }}
+      uses: exodigo/eli-public-test/.github/actions/tag-container@master
+      with:
+        container: ${{ steps.tags.outputs.temp_tag }}
+        tags: ${{ steps.tags.outputs.tags }}

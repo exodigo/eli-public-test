@@ -1,10 +1,13 @@
 name: 'tag-container'
-description: 'Add tags to a container'
+description: 'Adds tags to a given container and publish them'
 
 inputs:
   container:
-    description: The container to tag
+    description: The container to publish
     required: true
+  is_local:
+    description: Whether or not the container is local
+    default: "false"
   tags:
     description: The tags to add for the container
     default: ""
@@ -12,20 +15,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: config.aws
-    uses: aws-actions/configure-aws-credentials@v1-node16
-    with:
-      aws-region: ${{ env.AWS_ROLE_REGION }}
-      role-to-assume: ${{ env.AWS_ROLE_ARN }}
-      mask-aws-account-id: 'no'
-
   - name: container.publish
     shell: sh
-    env:
-      OCI_ENGINE: podman
     run: |
-      aws ecr get-login-password --region "${AWS_ROLE_REGION}" | podman login --username AWS --password-stdin "${AWS_ECR_NAME}"
-      ${OCI_ENGINE} pull "${{ inputs.container }}"
+      if [ "${{ inputs.is_local }}" == "false" ]; then
+        ${OCI_ENGINE} pull "${{ inputs.container }}"
+      fi
       tags="${{ inputs.tags }}"
       for t in ${tags}; do
         ${OCI_ENGINE} tag "${{ inputs.container }}" "${t}"
