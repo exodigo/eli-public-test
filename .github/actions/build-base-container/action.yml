@@ -51,7 +51,7 @@ runs:
       shell: sh
       run: |
         tags="${{ steps.tags.outputs.temp_tag }}"
-        if [ "${{ inputs.publish}}" == "true" ]; then
+        if [ "${{ inputs.publish}}" = "true" ]; then
           tags="${tags} ${{ steps.tags.outputs.tags }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
@@ -59,7 +59,6 @@ runs:
         __EOF__
 
     - name: container.publish.all
-      if: ${{ inputs.publish == 'true' }}
       uses: exodigo/eli-public-test/.github/actions/tag-container@master
       with:
         container: ${{ steps.tags.outputs.temp_tag }}
