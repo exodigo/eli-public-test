@@ -13,5 +13,5 @@ exec ${OCI_ENGINE} image build \
   --build-arg npm_creds=".npmrc" \
   --build-arg REGISTRY_NAME="${AWS_ECR_NAME}" \
   "${@}" \
-  --file ${OCI_CONTAINER_FILE} \
+  --file "${OCI_CONTAINER_FILE}" \
   .
