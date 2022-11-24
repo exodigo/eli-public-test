@@ -4,7 +4,7 @@ OCI_ENGINE="${OCI_ENGINE:-podman}"
 OCI_CONTAINER_FILE="${OCI_CONTAINER_FILE:-Containerfile}"
 
 echo "aaaaaa"
-echo "${OCI_ARG_LOCAL_TAG}"
+echo "bbbbb: ${OCI_ARG_LOCAL_TAG}"
 
 eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
 exec ${OCI_ENGINE} image build \
