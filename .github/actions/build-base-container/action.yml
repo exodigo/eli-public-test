@@ -63,3 +63,4 @@ runs:
       with:
         container: ${{ steps.tags.outputs.temp_tag }}
         tags: ${{ steps.prepare.outputs.final_tags }}
+        is_local: true

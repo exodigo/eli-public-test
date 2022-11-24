@@ -1,18 +1,18 @@
-name: 'build-python-container'
-description: 'Build and publish a python container'
+name: 'build-container-by-artifact'
+description: 'Build and publish a container for an artifact'
 
 inputs:
   container_name:
     description: The name of the container
     required: true
-  package_name:
-    description: The name of the package
+  artifact_name:
+    description: The name of the artifact
     required: true
-  package_version:
-    description: The version of the package
+  artifact_version:
+    description: The version of the artifact
     required: true
   stable_version:
-    description: The stable version of the package.
+    description: The stable version of the artifact.
     default: ""
   publish:
     description: Whether or not to publish the container (The temporary tag is published regardless)
@@ -32,8 +32,8 @@ runs:
       uses: exodigo/eli-public-test/.github/actions/build-base-container@master
       with:
         container_name: ${{ inputs.container_name }}
-        tag_names: ${{ inputs.package_version }} ${{ inputs.stable_version }}
+        tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}
         container_input: |
-          OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.package_name }}"
-          OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.package_version }}"
+          OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.artifact_name }}"
+          OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.artifact_version }}"
         publish: ${{ inputs.publish }}

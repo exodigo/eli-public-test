@@ -11,7 +11,7 @@ exec ${OCI_ENGINE} image build \
   --build-arg twine_creds=".pypirc" \
   --secret id=npm_secret,src="${HOME}/.npmrc" \
   --build-arg npm_creds=".npmrc" \
-  --build-arg AWS_ECR_NAME="${AWS_ECR_NAME}" \
+  --build-arg REGISTRY_NAME="${AWS_ECR_NAME}" \
   "${@}" \
   --file ${OCI_CONTAINER_FILE} \
   .
