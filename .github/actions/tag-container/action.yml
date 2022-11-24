@@ -5,9 +5,6 @@ inputs:
   container:
     description: The container to publish
     required: true
-  is_local:
-    description: Whether or not the container is local
-    default: "false"
   tags:
     description: The tags to add for the container
     default: ""
@@ -18,8 +15,8 @@ runs:
   - name: container.publish
     shell: sh
     run: |
-      if [ "${{ inputs.is_local }}" == "false" ]; then
-        ${OCI_ENGINE} pull "${{ inputs.container }}"
+      if ! ${OCI_ENGINE} image exists "${{ inputs.container }}"; then
+        ${OCI_ENGINE} image pull "${{ inputs.container }}"
       fi
       tags="${{ inputs.tags }}"
       for t in ${tags}; do

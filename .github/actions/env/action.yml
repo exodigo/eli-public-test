@@ -2,6 +2,8 @@ name: 'env'
 description: 'Setup environment, credentials, and common tools'
 
 inputs:
+  python-version:
+    description: Python version to install
   extra-apt-packages:
     description: Extra apt packages to install
     default: ""
@@ -15,6 +17,11 @@ runs:
       uses: exodigo/exodigo_ci_actions_apply-environment@s1
       with:
         secrets: ${{ inputs.secrets }}
+
+    - name: install.python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
 
     - name: install.base
       env:
