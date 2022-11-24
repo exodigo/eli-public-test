@@ -28,9 +28,19 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: container.build
-      id: build
-      uses: exodigo/eli-public-test/.github/actions/build-base-container@master
+    - name: extract.oidc
+      uses: exodigo/exodigo_github-action-oidc@v1
+      id: oidc
+
+    - name: checkout.exodigo-containers
+      uses: actions/checkout@v3
+      with:
+        path: exodigo-containers
+        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
+        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+
+    - name: env.setup
+      uses: ./exodigo-containers/.github/actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}

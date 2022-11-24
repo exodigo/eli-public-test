@@ -1,33 +1,59 @@
 name: 'build-container'
-description: 'Build a container'
+description: 'Build and publish a basic container'
 
 inputs:
+  container_name:
+    description: The name of the container
+    required: true
+  tag_names:
+    description: Tag names to generate tags for
+    default: ""
   container_file:
     description: Name of the file to use for build
     default: "Containerfile"
   working_directory:
     description: Working directory during build
     default: "."
-  container_tag:
-    description: The tag to give the container
-    required: true
   container_input:
     description: Input for Containerfile
     default: ""
+  publish:
+    description: Whether or not to publish the container (The temporary tag is published regardless)
+    default: "true"
 outputs:
   container:
-    description: A temporary tag of the built container
+    description: The created container
     value: ${{ steps.build.outputs.container }}
+  tags:
+    description: Additional tags created for the container
+    value: ${{ steps.tags.outputs.tags }}
 
 runs:
   using: "composite"
   steps:
+    - name: extract.oidc
+      uses: exodigo/exodigo_github-action-oidc@v1
+      id: oidc
+
+    - name: checkout.exodigo-containers
+      uses: actions/checkout@v3
+      with:
+        path: exodigo-containers
+        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
+        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+
+    - name: generate.tags
+      id: tags
+      uses: ./exodigo-containers/.github/actions/generate-tags
+      with:
+        container_name: ${{ inputs.container_name }}
+        tag_names: ${{ inputs.tag_names }}
+
     - name: container.build
       id: build
       shell: sh
       working-directory: ${{ inputs.working_directory }}
       env:
-
         OCI_CONTAINER_FILE: ${{ inputs.container_file }}
       run: |
         container="${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${AWS_ECR_CI_TEMPORARY_REPOSITORY}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}-$(date -u +%s)"
@@ -37,3 +63,21 @@ runs:
         container=${container}
         __EOF__
         . "${{ github.action_path }}/build-container.sh"
+
+    - name: prepare.final.tags
+      id: prepare
+      shell: sh
+      run: |
+        tags="${{ steps.build.outputs.container }}"
+        if [ "${{ inputs.publish}}" = "true" ]; then
+          tags="${tags} ${{ steps.tags.outputs.tags }}"
+        fi
+        cat >> "${GITHUB_OUTPUT}" << __EOF__
+        final_tags=${tags}
+        __EOF__
+
+    - name: container.publish.all
+      uses: exodigo/eli-public-test/.github/actions/tag-container@master
+      with:
+        container: ${{ steps.build.outputs.container }}
+        tags: ${{ steps.prepare.outputs.final_tags }}

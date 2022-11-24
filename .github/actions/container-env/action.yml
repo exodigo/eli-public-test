@@ -1,0 +1,17 @@
+name: 'container-env'
+description: 'Setup container environment'
+
+inputs:
+  secrets:
+    description: Secrets toJSON
+
+runs:
+  using: "composite"
+  steps:
+    - name: config.env
+      uses: exodigo/eli-public-test/.github/actions/env@master
+
+    - name: config.ci_engine
+      shell: sh
+      run: |
+        aws ecr get-login-password --region "${AWS_ROLE_REGION}" | ${OCI_ENGINE} login --username AWS --password-stdin "${AWS_ECR_NAME}"
