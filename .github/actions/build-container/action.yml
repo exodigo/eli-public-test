@@ -34,6 +34,7 @@ runs:
         OCI_ARG_LOCAL_TAG="--tag=${temp_tag}"
         eval "${{ inputs.container_input }}"
         . "${{ github.action_path }}/build-container.sh"
+        echo "AAAAAA: ${temp_tag}"
         cat >> "${GITHUB_OUTPUT}" << __EOF__
         temp_tag=${temp_tag}
         __EOF__
