@@ -18,8 +18,7 @@ runs:
       if ! ${OCI_ENGINE} image exists "${{ inputs.container }}"; then
         ${OCI_ENGINE} image pull "${{ inputs.container }}"
       fi
-      tags="${{ inputs.tags }}"
-      for t in ${tags}; do
+      for t in ${{ inputs.tags }}; do
         ${OCI_ENGINE} tag "${{ inputs.container }}" "${t}"
         ${OCI_ENGINE} push "${t}"
       done
