@@ -1,5 +1,5 @@
 name: 'generate-tags'
-description: 'Generate container tags for later usage'
+description: 'Generate full container tags for later usage'
 
 inputs:
   container_name:
@@ -9,9 +9,6 @@ inputs:
     description: Tag names to generate tags for
     default: ""
 outputs:
-  temp_tag:
-    description: Temporary tag for current run
-    value: ${{ steps.tags.outputs.temp_tag }}
   tags:
     description: The generated tags
     value: ${{ steps.tags.outputs.tags }}
@@ -22,15 +19,12 @@ runs:
     - name: set.tags
       id: tags
       shell: sh
-      env:
-        FULL_CONTAINER_NAME: ${{ env.AWS_ECR_NAME }}/${{ env.AWS_ECR_CI_REPOSITORY_NAME }}/${{ inputs.container_name }}
       run: |
         if [ -z "${{ inputs.tag_names}}" ]; then
           tags=""
         else
-          tags="$(printf "${FULL_CONTAINER_NAME}:%s " ${{ inputs.tag_names }})"
+          tags="$(printf "${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${{ inputs.container_name }}:%s " ${{ inputs.tag_names }})"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        temp_tag=${FULL_CONTAINER_NAME}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
         tags=${tags}
         __EOF__

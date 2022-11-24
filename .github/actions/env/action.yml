@@ -30,6 +30,7 @@ runs:
       shell: sh
       run: |
         sudo apt install -y apt ${{ inputs.extra-apt-packages }}
+        sudo apt install -y apt ${OCI_ENGINE}
 
     - name: config.aws
       uses: aws-actions/configure-aws-credentials@v1-node16
