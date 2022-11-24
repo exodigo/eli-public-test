@@ -1,0 +1,39 @@
+name: 'build-python-container'
+description: 'Build and publish a python container'
+
+inputs:
+  container_name:
+    description: The name of the container
+    required: true
+  package_name:
+    description: The name of the package
+    required: true
+  package_version:
+    description: The version of the package
+    required: true
+  stable_version:
+    description: The stable version of the package.
+    default: ""
+  publish:
+    description: Whether or not to publish the container (The temporary tag is published regardless)
+    default: "true"
+outputs:
+  temp_tag:
+    description: The temporary tag given to the container
+    value: '${{ steps.tags.outputs.temp_tag }}'
+  tags:
+    description: The tags created for the container
+    value: '${{ steps.tags.outputs.tags }}'
+
+runs:
+  using: "composite"
+  steps:
+    - name: container.build
+      uses: exodigo/eli-public-test/.github/actions/build-base-container@master
+      with:
+        container_name: ${{ inputs.container_name }}
+        tag_names: ${{ inputs.package_version }} ${{ inputs.stable_version }}
+        container_input: |
+          OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.package_name }}"
+          OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.package_version }}"
+        publish: ${{ inputs.publish }}

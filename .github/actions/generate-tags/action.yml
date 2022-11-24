@@ -23,7 +23,7 @@ runs:
       id: tags
       shell: sh
       env:
-        FULL_CONTAINER_NAME: ${{ env.AWS_ECR_NAME }}/exodigo-ci/${{ inputs.container_name }}
+        FULL_CONTAINER_NAME: ${{ env.AWS_ECR_NAME }}/${{ env.AWS_ECR_CI_REPOSITORY_NAME }}/${{ inputs.container_name }}
       run: |
         if [ -z "${{ inputs.tag_names}}" ]; then
           tags=""

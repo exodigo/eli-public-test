@@ -36,7 +36,7 @@ runs:
       uses: exodigo/eli-public-test/.github/actions/generate-tags@master
       with:
         container_name: ${{ inputs.container_name }}
-        tag_names: latest
+        tag_names: ${{ inputs.tag_names }}
 
     - name: container.build
       uses: exodigo/eli-public-test/.github/actions/build-container@master
