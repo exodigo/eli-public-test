@@ -3,8 +3,11 @@ description: 'Build a container'
 
 inputs:
   container_file:
-    description: Path to the Containerfile
-    required: true
+    description: Name of the file to use for build
+    default: "Containerfile"
+  working_directory:
+    description: Working directory during build
+    default: "."
   container_tag:
     description: The tag to give the container
     required: true
@@ -17,6 +20,7 @@ runs:
   steps:
     - name: container.build
       shell: sh
+      working-directory: ${{ inputs.working_directory }}
       env:
         OCI_ARG_LOCAL_TAG: --tag=${{ inputs.container_tag }}
         OCI_CONTAINER_FILE: ${{ inputs.container_file }}

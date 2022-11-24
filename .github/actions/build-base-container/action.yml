@@ -9,8 +9,11 @@ inputs:
     description: Tag names to generate tags for
     default: ""
   container_file:
-    description: Path to the Containerfile
-    required: true
+    description: Name of the file to use for build
+    default: "Containerfile"
+  working_directory:
+    description: Working directory during build
+    default: "."
   container_input:
     description: Input for Containerfile
     default: ""
@@ -39,6 +42,7 @@ runs:
       uses: exodigo/eli-public-test/.github/actions/build-container@master
       with:
         container_file: ${{ inputs.container_file }}
+        working_directory: ${{ inputs.working_directory }}
         container_tag: ${{ steps.tags.outputs.temp_tag }}
         container_input: ${{ inputs.container_input }}
 
