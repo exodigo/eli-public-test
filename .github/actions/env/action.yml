@@ -13,6 +13,14 @@ runs:
       with:
         secrets: ${{ inputs.secrets }}
 
+    - name: install.base
+      env:
+        DEBIAN_FRONTEND: noninteractive
+        TZ: Etc/UTC
+      shell: sh
+      run: |
+        sudo apt install -y apt ${{ inputs.extra-apt-packages }}
+
     - name: config.aws
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
