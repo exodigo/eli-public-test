@@ -18,9 +18,9 @@ inputs:
     description: Whether or not to publish the container (The temporary tag is published regardless)
     default: "true"
 outputs:
-  temp_tag:
-    description: The temporary tag given to the container
-    value: ${{ steps.build.outputs.temp_tag }}
+  container:
+    description: The created container
+    value: ${{ steps.build.outputs.container }}
   tags:
     description: The tags created for the container
     value: ${{ steps.build.outputs.tags }}

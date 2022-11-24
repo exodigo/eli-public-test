@@ -21,11 +21,11 @@ inputs:
     description: Whether or not to publish the container (The temporary tag is published regardless)
     default: "true"
 outputs:
-  temp_tag:
-    description: The temporary tag given to the container
-    value: ${{ steps.build.outputs.temp_tag }}
+  container:
+    description: The created container
+    value: ${{ steps.build.outputs.container }}
   tags:
-    description: The tags created for the container
+    description: Additional tags created for the container
     value: ${{ steps.tags.outputs.tags }}
 
 runs:
@@ -50,7 +50,7 @@ runs:
       id: prepare
       shell: sh
       run: |
-        tags="${{ steps.build.outputs.temp_tag }}"
+        tags="${{ steps.build.outputs.container }}"
         if [ "${{ inputs.publish}}" = "true" ]; then
           tags="${tags} ${{ steps.tags.outputs.tags }}"
         fi
@@ -61,5 +61,5 @@ runs:
     - name: container.publish.all
       uses: exodigo/eli-public-test/.github/actions/tag-container@master
       with:
-        container: ${{ steps.build.outputs.temp_tag }}
+        container: ${{ steps.build.outputs.container }}
         tags: ${{ steps.prepare.outputs.final_tags }}
