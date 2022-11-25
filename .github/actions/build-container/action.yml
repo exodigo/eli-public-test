@@ -36,6 +36,11 @@ runs:
       run: |
         ln -s "${{ github.action_path }}/.." exodigo-containers
 
+    - name: test
+      shell: sh
+      run: |
+        ls -R exodigo-containers
+
     - name: generate.tags
       id: tags
       uses: ./exodigo-containers/.github/actions/generate-tags
