@@ -31,18 +31,10 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: test
+    - name: set.exodigo-containers
       shell: sh
       run: |
-        echo ${{ github.action_repository }}
-        echo ${{ github.action_ref }}
-
-    - name: checkout.exodigo-containers
-      uses: actions/checkout@v3
-      with:
-        path: exodigo-containers
-        repository: ${{ github.action_repository }}
-        ref: ${{ github.action_ref }}
+        ln -s "${{ github.action_path }}/.." exodigo-containers
 
     - name: generate.tags
       id: tags
