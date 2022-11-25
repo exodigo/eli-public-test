@@ -9,9 +9,26 @@ runs:
   using: "composite"
   steps:
     - name: config.env
-      uses: exodigo/exodigo_ci_actions_exodigo-ci-env@s1
+      if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
+      uses: exodigo/eli-public-test/.github/actions/exodigo-ci-env@master
+
+    - name: install.oci_engine
+      if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
+      env:
+        DEBIAN_FRONTEND: noninteractive
+        TZ: Etc/UTC
+      shell: sh
+      run: |
+        sudo apt install -y apt ${OCI_ENGINE}
 
     - name: config.ci_engine
+      if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
       shell: sh
       run: |
         aws ecr get-login-password --region "${AWS_ROLE_REGION}" | ${OCI_ENGINE} login --username AWS --password-stdin "${AWS_ECR_NAME}"
+
+    - name: set.ci_container_env
+      if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
+      shell: sh
+      run: |
+        echo "CI_CONTAINER_ENV_SET=true" >> "${GITHUB_ENV}"
