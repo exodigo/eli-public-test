@@ -42,6 +42,11 @@ runs:
         repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
         ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
 
+    - name: show.files
+      shell: sh
+      run: |
+        ls -R exodigo-containers
+
     - name: generate.tags
       id: tags
       uses: ./exodigo-containers/.github/actions/generate-tags
