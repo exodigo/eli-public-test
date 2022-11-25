@@ -1,0 +1,53 @@
+name: 'build-versioned-container'
+description: 'Build and publish a container with version tags'
+
+inputs:
+  container_name:
+    description: The name of the container
+    required: true
+  working_directory:
+    description: The desired working directory
+    default: "."
+  container_input:
+    description: Input for Containerfile
+    default: ""
+  publish:
+    description: Whether or not to publish the container (The temporary tag is published regardless)
+    default: "true"
+outputs:
+  container:
+    description: The created container
+    value: ${{ steps.build.outputs.container }}
+  tags:
+    description: The tags created for the container
+    value: ${{ steps.build.outputs.tags }}
+  ci-phase:
+    description: 'CI phase: review, branch, tag'
+    value: ${{ steps.version.outputs.ci-phase }}
+  version:
+    description: Calculated version
+    value: ${{ steps.version.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: set.exodigo-containers-actions
+      shell: sh
+      run: |
+        ln -sfn "${{ github.action_path }}/.." exodigo-containers-actions
+
+    - name: env.version
+      id: version
+      uses: ./exodigo-containers-actions/.github/actions/calculate-version
+      with:
+        working_directory: ${{ inputs.working_directory }}
+
+    - name: build.container
+      uses: ./exodigo-containers-actions/.github/actions/build-container
+      with:
+        container_name: ${{ inputs.container_name }}
+        tag_names: ${{ steps.version.outputs.version }}
+        container_file: ${{ inputs.container_file }}
+        working_directory: ${{ inputs.working_directory }}
+        container_input: ${{ inputs.container_input }}
+        publish: ${{ inputs.publish }}

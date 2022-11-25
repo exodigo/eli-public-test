@@ -1,0 +1,49 @@
+name: 'calculate-version'
+description: 'Calculates version based on version.txt and CI phase'
+
+inputs:
+  working_directory:
+    description: The desired working directory
+    default: "."
+outputs:
+  ci-phase:
+    description: 'CI phase: review, branch, tag'
+    value: ${{ steps.version.outputs.ci-phase }}
+  version:
+    description: Calculated version
+    value: ${{ steps.version.outputs.version }}
+  stable_version:
+    description: Calculated stable version (Only if relevant)
+    value: ${{ steps.version.outputs.stable_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: env.version
+      id: version
+      working-directory: ${{ inputs.working_directory }}
+      shell: sh
+      run: |
+        version="$(cat version.txt | sed 's/-.*//')"
+        case "${{ github.event.ref }}" in
+          refs/remotes/pull/*|refs/heads/gerrit/*)
+            ci_phase=review
+            version="${version}-dev-${{ github.run_number }}"
+            ;;
+          refs/tags/*)
+            ci_phase=tag
+            stable_version="$(awk -F. '{print $1 "." $2}' <<< ${version})"
+            ;;
+          *)
+            ci_phase=branch
+            version="${version}-a-${{ github.run_number }}"
+            ;;
+        esac
+        echo "${version}" > version.txt
+        echo "VERSION: ${version}"
+
+        cat >> "${GITHUB_OUTPUT}" << __EOF__
+        ci-phase=${ci_phase}
+        version=${version}
+        stable_version=${stable_version}
+        __EOF__
