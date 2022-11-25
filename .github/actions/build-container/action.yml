@@ -31,21 +31,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: extract.oidc
-      uses: exodigo/exodigo_github-action-oidc@v1
-      id: oidc
-
     - name: checkout.exodigo-containers
       uses: actions/checkout@v3
       with:
         path: exodigo-containers
-        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
-        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
-
-    - name: show.files
-      shell: sh
-      run: |
-        ls -R exodigo-containers
+        repository: ${{ github.action_repository }}
+        ref: ${{ github.action_ref }}
 
     - name: generate.tags
       id: tags
