@@ -1,5 +1,5 @@
-name: 'build-container-by-artifact'
-description: 'Build and publish a container for an artifact'
+name: 'build-python-container'
+description: 'Build and publish a container for a python package'
 
 inputs:
   container_name:
@@ -37,12 +37,14 @@ runs:
         ln -s "${{ github.action_path }}/.." exodigo-containers-actions || true
 
     - name: build.container
-      uses: ./exodigo-containers-actions/build-container
+      uses: ./exodigo-containers-actions/build-container-by-artifact
       with:
         container_name: ${{ inputs.container_name }}
-        tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}
+        artifact_name: ${{ inputs.artifact_name }}
+        artifact_version: ${{ inputs.artifact_version }}
+        stable_version: ${{ inputs.stable_version }}
         container_input: |
-          OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.artifact_name }}"
-          OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.artifact_version }}"
+          OCI_ARG_PIP_SECRET_ID="--secret id=pip_secret,src=${HOME}/.config/pip/pip.conf"
+          OCI_ARG_PIP_SECRET_ID="--build-arg=pip_creds=.config/pip/pip.conf"
           ${{ inputs.container_input }}
         publish: ${{ inputs.publish }}
