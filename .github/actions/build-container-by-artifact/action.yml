@@ -31,7 +31,7 @@ runs:
     - name: set.exodigo-containers-actions
       shell: sh
       run: |
-        ln -sfn "${{ github.action_path }}/.." exodigo-containers-actions
+        ln -s "${{ github.action_path }}/.." exodigo-containers-actions
 
     - name: build.container
       uses: ./exodigo-containers-actions/build-container
