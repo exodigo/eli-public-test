@@ -28,19 +28,13 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: extract.oidc
-      uses: exodigo/exodigo_github-action-oidc@v1
-      id: oidc
-
-    - name: checkout.exodigo-containers
-      uses: actions/checkout@v3
-      with:
-        path: exodigo-containers
-        repository: ${{ steps.oidc.outputs.job_workflow_repo_name_and_owner }}
-        ref: ${{ steps.oidc.outputs.job_workflow_repo_ref }}
+    - name: set.exodigo-containers-actions
+      shell: sh
+      run: |
+        ln -s "${{ github.action_path }}/.." exodigo-containers-actions
 
     - name: env.setup
-      uses: ./exodigo-containers/.github/actions/build-container
+      uses: ./exodigo-containers-actions/.github/actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}

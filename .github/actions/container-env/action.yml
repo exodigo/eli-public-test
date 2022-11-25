@@ -2,6 +2,9 @@ name: 'container-env'
 description: 'Setup container environment'
 
 inputs:
+  working_directory:
+    description: The desired working directory
+    default: "."
   secrets:
     description: Secrets toJSON
 
@@ -12,6 +15,7 @@ runs:
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
       uses: exodigo/eli-public-test/.github/actions/exodigo-ci-env@master
       with:
+        working_directory: ${{ inputs.working_directory }}
         secrets: ${{ inputs.secrets }}
 
     - name: install.oci_engine
