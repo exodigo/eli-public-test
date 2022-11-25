@@ -38,6 +38,11 @@ runs:
         repository: ${{ github.action_repository }}
         ref: ${{ github.action_ref }}
 
+    - name: show.files
+      shell: sh
+      run: |
+        ls -R exodigo-containers
+
     - name: generate.tags
       id: tags
       uses: ./exodigo-containers/.github/actions/generate-tags
