@@ -32,7 +32,7 @@ runs:
             ;;
           refs/tags/*)
             ci_phase=tag
-            stable_version="$(awk -F. '{print $1 "." $2}' <<< ${version})"
+            stable_version="$(echo ${version} | awk -F. '{print $1 "." $2}')"
             ;;
           *)
             ci_phase=branch
