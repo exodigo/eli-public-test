@@ -27,6 +27,9 @@ outputs:
   version:
     description: Calculated version
     value: ${{ steps.version.outputs.version }}
+  stable_version:
+    description: Calculated stable version (Only if relevant)
+    value: ${{ steps.version.outputs.stable_version }}
 
 runs:
   using: "composite"
@@ -38,12 +41,12 @@ runs:
 
     - name: env.version
       id: version
-      uses: ./exodigo-containers-actions/.github/actions/calculate-version
+      uses: ./exodigo-containers-actions/calculate-version
       with:
         working_directory: ${{ inputs.working_directory }}
 
     - name: build.container
-      uses: ./exodigo-containers-actions/.github/actions/build-container
+      uses: ./exodigo-containers-actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ steps.version.outputs.version }}

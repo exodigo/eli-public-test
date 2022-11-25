@@ -34,7 +34,7 @@ runs:
         ln -sfn "${{ github.action_path }}/.." exodigo-containers-actions
 
     - name: build.container
-      uses: ./exodigo-containers-actions/.github/actions/build-container
+      uses: ./exodigo-containers-actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}
