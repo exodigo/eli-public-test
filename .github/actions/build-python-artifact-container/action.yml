@@ -1,4 +1,4 @@
-name: 'build-python-container'
+name: 'build-python-artifact-container'
 description: 'Build and publish a container for a python package'
 
 inputs:
