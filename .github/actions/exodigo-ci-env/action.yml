@@ -1,4 +1,4 @@
-name: 'env'
+name: 'exodigo-ci-env'
 description: 'Setup environment, credentials, and common tools'
 
 inputs:
@@ -14,25 +14,28 @@ runs:
   using: "composite"
   steps:
     - name: apply.environment
+      if: ${{ env.CI_ENV_SET }} != "true"
       uses: exodigo/exodigo_ci_actions_apply-environment@s1
       with:
         secrets: ${{ inputs.secrets }}
 
     - name: install.python
+      if: ${{ env.CI_ENV_SET }} != "true"
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
 
     - name: install.base
+      if: ${{ env.CI_ENV_SET }} != "true"
       env:
         DEBIAN_FRONTEND: noninteractive
         TZ: Etc/UTC
       shell: sh
       run: |
         sudo apt install -y apt ${{ inputs.extra-apt-packages }}
-        sudo apt install -y apt ${OCI_ENGINE}
 
     - name: config.aws
+      if: ${{ env.CI_ENV_SET }} != "true"
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-region: ${{ env.AWS_ROLE_REGION }}
@@ -40,14 +43,22 @@ runs:
         mask-aws-account-id: 'no'
 
     - name: config.tools
+      if: ${{ env.CI_ENV_SET }} != "true"
       shell: sh
       run: |
-        for tool in pip twine npm; do
+        for tool in twine npm; do
           aws codeartifact login \
               --region "${AWS_CODEARTIFACT_REGION}" \
               --domain "${AWS_CODEARTIFACT_CI_DOMAIN_NAME}" \
               --repository "${AWS_CODEARTIFACT_CI_REPOSITORY_NAME}" \
               --tool "${tool}"
         done
-        pip config set global.extra-index-url https://pypi.python.org/simple/
-        aws ecr get-login-password --region "${AWS_ROLE_REGION}" | ${OCI_ENGINE} login --username AWS --password-stdin "${AWS_ECR_NAME}"
+        if [ -x package/.github/ci-env-custom.sh ]; then
+          (cd package && ./.github/ci-env-custom.sh)
+        fi
+
+    - name: set.ci_env
+      if: ${{ env.CI_ENV_SET }} != "true"
+      shell: sh
+      run: |
+        echo "CI_ENV_SET=true" >> "${GITHUB_ENV}"

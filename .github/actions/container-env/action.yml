@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: config.env
-      uses: exodigo/eli-public-test/.github/actions/env@master
+      uses: exodigo/exodigo_ci_actions_exodigo-ci-env@s1
 
     - name: config.ci_engine
       shell: sh
