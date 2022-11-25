@@ -11,6 +11,8 @@ runs:
     - name: config.env
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
       uses: exodigo/eli-public-test/.github/actions/exodigo-ci-env@master
+      with:
+        secrets: ${{ inputs.secrets }}
 
     - name: install.oci_engine
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
