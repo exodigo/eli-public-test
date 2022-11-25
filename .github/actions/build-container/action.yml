@@ -31,19 +31,14 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: set.exodigo-containers
+    - name: set.exodigo-containers-actions
       shell: sh
       run: |
-        ln -s "${{ github.action_path }}/.." exodigo-containers
-
-    - name: test
-      shell: sh
-      run: |
-        ls -R exodigo-containers
+        ln -s "${{ github.action_path }}/.." exodigo-containers-actions
 
     - name: generate.tags
       id: tags
-      uses: ./exodigo-containers/.github/actions/generate-tags
+      uses: ./exodigo-containers-actions/generate-tags
       with:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ inputs.tag_names }}
@@ -78,7 +73,7 @@ runs:
         __EOF__
 
     - name: container.publish.all
-      uses: ./exodigo-containers/.github/actions/tag-container
+      uses: ./exodigo-containers-actions/tag-container
       with:
         container: ${{ steps.build.outputs.container }}
         tags: ${{ steps.prepare.outputs.final_tags }}
