@@ -1,0 +1,61 @@
+name: 'exodigo-ci-env'
+description: 'Setup environment, credentials, and common tools'
+
+inputs:
+  working_directory:
+    description: The desired working directory
+    default: "."
+  extra-apt-packages:
+    description: Extra apt packages to install
+    default: ""
+  secrets:
+    description: Secrets toJSON
+
+runs:
+  using: "composite"
+  steps:
+    - name: apply.environment
+      if: ${{ env.CI_ENV_SET }} != "true"
+      uses: exodigo/exodigo_ci_actions_apply-environment@s1
+      with:
+        secrets: ${{ inputs.secrets }}
+
+    - name: install.base
+      if: ${{ env.CI_ENV_SET }} != "true"
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        DEBIAN_FRONTEND: noninteractive
+        TZ: Etc/UTC
+      shell: sh
+      run: |
+        sudo apt install -y apt ${{ inputs.extra-apt-packages }}
+
+    - name: config.aws
+      if: ${{ env.CI_ENV_SET }} != "true"
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: ${{ env.AWS_ROLE_REGION }}
+        role-to-assume: ${{ env.AWS_ROLE_ARN }}
+        mask-aws-account-id: 'no'
+
+    - name: config.tools
+      if: ${{ env.CI_ENV_SET }} != "true"
+      working-directory: ${{ inputs.working_directory }}
+      shell: sh
+      run: |
+        for tool in twine npm; do
+          aws codeartifact login \
+              --region "${AWS_CODEARTIFACT_REGION}" \
+              --domain "${AWS_CODEARTIFACT_CI_DOMAIN_NAME}" \
+              --repository "${AWS_CODEARTIFACT_CI_REPOSITORY_NAME}" \
+              --tool "${tool}"
+        done
+        if [ -x .github/ci-env-custom.sh ]; then
+          ./.github/ci-env-custom.sh
+        fi
+
+    - name: set.ci_env
+      if: ${{ env.CI_ENV_SET }} != "true"
+      shell: sh
+      run: |
+        echo "CI_ENV_SET=true" >> "${GITHUB_ENV}"
