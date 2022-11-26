@@ -34,7 +34,10 @@ runs:
     - name: set.exodigo-containers-actions
       shell: sh
       run: |
-        ln -s "${{ github.action_path }}/.." exodigo-containers-actions || true
+        . "${{ github.action_path }}/../.action"
+        if ! [ -d "${action_repo}" ]; then
+          ln -sfn "${{ github.action_path }}/.." "${action_repo}"
+        fi
 
     - name: build.container
       uses: ./exodigo-containers-actions/build-container-by-artifact
