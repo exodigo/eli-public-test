@@ -11,8 +11,8 @@ inputs:
   artifact_version:
     description: The version of the artifact
     required: true
-  stable_version:
-    description: The stable version of the artifact.
+  version_y_stream:
+    description: The version y stream of the artifact
     default: ""
   container_input:
     description: Input for Containerfile
@@ -43,7 +43,7 @@ runs:
       uses: ./exodigo-containers-actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
-        tag_names: ${{ inputs.artifact_version }} ${{ inputs.stable_version }}
+        tag_names: ${{ inputs.artifact_version }} ${{ inputs.version_y_stream }}
         container_input: |
           OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.artifact_name }}"
           OCI_ARG_VERSION="--build-arg=ARTIFACT_VERSION=${{ inputs.artifact_version }}"

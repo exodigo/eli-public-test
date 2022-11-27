@@ -12,9 +12,9 @@ outputs:
   version:
     description: Calculated version
     value: ${{ steps.version.outputs.version }}
-  stable_version:
-    description: Calculated stable version (Only if relevant)
-    value: ${{ steps.version.outputs.stable_version }}
+  version_y_stream:
+    description: Calculated version y stream
+    value: ${{ steps.version.outputs.version_y_stream }}
 
 runs:
   using: "composite"
@@ -32,18 +32,20 @@ runs:
             ;;
           refs/tags/*)
             ci_phase=tag
-            stable_version="$(echo ${version} | awk -F. '{print $1 "." $2}')"
             ;;
           *)
             ci_phase=branch
             version="${version}-a-${{ github.run_number }}"
             ;;
         esac
+
+        version_y_stream="$(echo ${version} | awk -F. '{print $1 "." $2}')"
         echo "${version}" > version.txt
         echo "VERSION: ${version}"
+        echo "VERSION_Y_STREAM: ${version_y_stream}"
 
         cat >> "${GITHUB_OUTPUT}" << __EOF__
         ci-phase=${ci_phase}
         version=${version}
-        stable_version=${stable_version}
+        version_y_stream=${version_y_stream}
         __EOF__

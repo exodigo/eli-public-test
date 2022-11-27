@@ -11,8 +11,8 @@ inputs:
   artifact_version:
     description: The version of the artifact
     required: true
-  stable_version:
-    description: The stable version of the artifact.
+  version_y_stream:
+    description: The version y stream of the artifact
     default: ""
   container_input:
     description: Input for Containerfile
@@ -45,7 +45,7 @@ runs:
         container_name: ${{ inputs.container_name }}
         artifact_name: ${{ inputs.artifact_name }}
         artifact_version: ${{ inputs.artifact_version }}
-        stable_version: ${{ inputs.stable_version }}
+        version_y_stream: ${{ inputs.version_y_stream }}
         container_input: |
           OCI_ARG_PIP_SECRET_ID="--secret id=pip_secret,src=${HOME}/.config/pip/pip.conf"
           OCI_ARG_PIP_SECRET_ID="--build-arg=pip_creds=.config/pip/pip.conf"
