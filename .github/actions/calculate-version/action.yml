@@ -6,9 +6,9 @@ inputs:
     description: The desired working directory
     default: "."
 outputs:
-  ci-phase:
+  ci_phase:
     description: 'CI phase: review, branch, tag'
-    value: ${{ steps.version.outputs.ci-phase }}
+    value: ${{ steps.version.outputs.ci_phase }}
   version:
     description: Calculated version
     value: ${{ steps.version.outputs.version }}
@@ -45,7 +45,7 @@ runs:
         echo "VERSION_Y_STREAM: ${version_y_stream}"
 
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        ci-phase=${ci_phase}
+        ci_phase=${ci_phase}
         version=${version}
         version_y_stream=${version_y_stream}
         __EOF__
