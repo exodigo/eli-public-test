@@ -2,7 +2,7 @@ name: 'container-env'
 description: 'Setup container environment'
 
 inputs:
-  working_directory:
+  working-directory:
     description: The desired working directory
     default: "."
   secrets:
