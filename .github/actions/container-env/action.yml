@@ -13,7 +13,7 @@ runs:
   steps:
     - name: config.env
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
-      uses: exodigo/eli-public-test/.github/actions/exodigo-ci-env@master
+      uses: exodigo/exodigo_ci_common/actions/ci-env@test
       with:
         working_directory: ${{ inputs.working_directory }}
         secrets: ${{ inputs.secrets }}
