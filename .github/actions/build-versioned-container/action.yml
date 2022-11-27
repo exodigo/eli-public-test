@@ -44,7 +44,7 @@ runs:
       shell: sh
       run: |
         tag_names=${{ steps.version.outputs.version }}
-        if [ "${{ steps.version.outputs.ci_phase }}" != "tag" ]; then
+        if [ "${{ steps.version.outputs.ci_phase }}" = "tag" ]; then
           tag_names="${tag_names} ${{ steps.version.outputs.version_y_stream }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
