@@ -2,7 +2,7 @@ name: 'exodigo-ci-env'
 description: 'Setup environment, credentials, and common tools'
 
 inputs:
-  working_directory:
+  working-directory:
     description: The desired working directory
     default: "."
   extra-apt-packages:
@@ -22,7 +22,7 @@ runs:
 
     - name: install.base
       if: ${{ env.CI_ENV_SET }} != "true"
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.working-directory }}
       env:
         DEBIAN_FRONTEND: noninteractive
         TZ: Etc/UTC
@@ -40,7 +40,7 @@ runs:
 
     - name: config.tools
       if: ${{ env.CI_ENV_SET }} != "true"
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.working-directory }}
       shell: sh
       run: |
         for tool in twine npm; do

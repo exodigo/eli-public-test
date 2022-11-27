@@ -5,7 +5,7 @@ inputs:
   container_name:
     description: The name of the container
     required: true
-  working_directory:
+  working-directory:
     description: The desired working directory
     default: "."
   container_input:
@@ -37,7 +37,7 @@ runs:
       id: version
       uses: exodigo/exodigo_ci_common/actions/gen-version@test
       with:
-        working_directory: ${{ inputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
 
     - name: prepare.tag_names
       id: tag_names
@@ -57,6 +57,6 @@ runs:
         container_name: ${{ inputs.container_name }}
         tag_names: ${{ steps.tag_names.outputs.tag_names }}
         container_file: ${{ inputs.container_file }}
-        working_directory: ${{ inputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
         container_input: ${{ inputs.container_input }}
         publish: ${{ inputs.publish }}

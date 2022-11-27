@@ -15,7 +15,7 @@ runs:
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
       uses: exodigo/exodigo_ci_common/actions/ci-env@test
       with:
-        working_directory: ${{ inputs.working_directory }}
+        working-directory: ${{ inputs.working-directory }}
         secrets: ${{ inputs.secrets }}
 
     - name: install.oci_engine

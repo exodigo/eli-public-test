@@ -11,7 +11,7 @@ inputs:
   container_file:
     description: Name of the file to use for build
     default: "Containerfile"
-  working_directory:
+  working-directory:
     description: Working directory during build
     default: "."
   container_input:
@@ -49,7 +49,7 @@ runs:
     - name: container.build
       id: build
       shell: sh
-      working-directory: ${{ inputs.working_directory }}
+      working-directory: ${{ inputs.working-directory }}
       env:
         OCI_CONTAINER_FILE: ${{ inputs.container_file }}
       run: |
