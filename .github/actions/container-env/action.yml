@@ -13,7 +13,7 @@ runs:
   steps:
     - name: config.env
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
-      uses: exodigo/eli-public-test/.github/actions/exodigo-ci-env@master
+      uses: exodigo/exodigo_ci_actions_exodigo-ci-env@s1
       with:
         working_directory: ${{ inputs.working_directory }}
         secrets: ${{ inputs.secrets }}
@@ -37,4 +37,6 @@ runs:
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
       shell: sh
       run: |
-        echo "CI_CONTAINER_ENV_SET=true" >> "${GITHUB_ENV}"
+        cat >> "${GITHUB_ENV}" << __EOF__
+        CI_CONTAINER_ENV_SET=true
+        __EOF__

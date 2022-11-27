@@ -54,8 +54,10 @@ runs:
         OCI_CONTAINER_FILE: ${{ inputs.container_file }}
       run: |
         container="${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${AWS_ECR_CI_TEMPORARY_REPOSITORY}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}-$(date -u +%s)"
-        export OCI_ARG_LOCAL_TAG="--tag=${container}"
-        for x in $(echo "${{ inputs.container_input }}" | sed 's/=.*//'); do
+        eval "${{ inputs.container_input }}"
+        OCI_ARG_LOCAL_TAG="--tag=${container}"
+        set | sed -n -e 's/^\(OCI_ARG_.*\)=.*/\1/ p'
+        for x in $(set | sed -n -e 's/^\(OCI_ARG_.*\)=.*/\1/ p'); do
           eval "export ${x}"
         done
         "${{ github.action_path }}/build-container.sh"
@@ -76,7 +78,7 @@ runs:
         __EOF__
 
     - name: container.publish.all
-      uses: ./exodigo-containers-actions/tag-container
+      uses: ./exodigo-containers-actions/push-container
       with:
         container: ${{ steps.build.outputs.container }}
         tags: ${{ steps.prepare.outputs.final_tags }}

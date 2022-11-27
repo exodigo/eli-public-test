@@ -1,5 +1,5 @@
-name: 'tag-container'
-description: 'Adds tags to a given container and publish them'
+name: 'push-container'
+description: 'Add tags to a given container and publish them'
 
 inputs:
   container:
@@ -19,6 +19,6 @@ runs:
         ${OCI_ENGINE} image pull "${{ inputs.container }}"
       fi
       for t in ${{ inputs.tags }}; do
-        ${OCI_ENGINE} tag "${{ inputs.container }}" "${t}"
-        ${OCI_ENGINE} push "${t}"
+        ${OCI_ENGINE} image tag "${{ inputs.container }}" "${t}"
+        ${OCI_ENGINE} image push "${t}"
       done

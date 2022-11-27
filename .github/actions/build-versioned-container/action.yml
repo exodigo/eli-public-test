@@ -27,9 +27,6 @@ outputs:
   version:
     description: Calculated version
     value: ${{ steps.version.outputs.version }}
-  stable_version:
-    description: Calculated stable version (Only if relevant)
-    value: ${{ steps.version.outputs.stable_version }}
 
 runs:
   using: "composite"
