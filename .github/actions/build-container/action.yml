@@ -56,7 +56,6 @@ runs:
         container="${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${AWS_ECR_CI_TEMPORARY_REPOSITORY}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}-$(date -u +%s)"
         eval "${{ inputs.container_input }}"
         OCI_ARG_LOCAL_TAG="--tag=${container}"
-        set | sed -n -e 's/^\(OCI_ARG_\)=.*/\1/ p'
         for x in $(set | sed -n -e 's/^\(OCI_ARG_[^=]*\)=.*/\1/ p'); do
           eval "export ${x}"
         done
