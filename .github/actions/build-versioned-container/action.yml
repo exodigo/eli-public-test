@@ -39,16 +39,16 @@ runs:
       with:
         working-directory: ${{ inputs.working-directory }}
 
-    - name: prepare.names
-      id: names
+    - name: prepare.tags
+      id: tags
       shell: sh
       run: |
-        container_names=${{ steps.version.outputs.version }}
+        tags=${{ steps.version.outputs.version }}
         if [ "${{ steps.version.outputs.ci_phase }}" = "tag" ]; then
-          container_names="${container_names} ${{ steps.version.outputs.version_y_stream }}"
+          tags="${tags} ${{ steps.version.outputs.version_y_stream }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        container_names=${container_names}
+        tags=${tags}
         __EOF__
 
     - name: build.container
@@ -56,7 +56,7 @@ runs:
       uses: ./exodigo-containers-actions/build-container
       with:
         container_alias: ${{ inputs.container_alias }}
-        container_names: ${{ steps.names.outputs.container_names }}
+        tags: ${{ steps.tags.outputs.container_names }}
         container_file: ${{ inputs.container_file }}
         working-directory: ${{ inputs.working-directory }}
         container_input: ${{ inputs.container_input }}
