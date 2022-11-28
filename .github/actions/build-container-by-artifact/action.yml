@@ -2,7 +2,7 @@ name: 'build-container-by-artifact'
 description: 'Build and publish a container for an artifact'
 
 inputs:
-  container_name:
+  container_alias:
     description: The name of the container
     required: true
   artifact_name:
@@ -18,15 +18,15 @@ inputs:
     description: Input for Containerfile
     default: ""
   publish:
-    description: Whether or not to publish the container (The temporary tag is published regardless)
+    description: Whether or not to publish the container (The temporary container name is published regardless)
     default: "true"
 outputs:
   container:
     description: The created container
     value: ${{ steps.build.outputs.container }}
-  tags:
-    description: The tags created for the container
-    value: ${{ steps.build.outputs.tags }}
+  container_names:
+    description: Additional names created for the container
+    value: ${{ steps.build.outputs.container_names }}
 
 runs:
   using: "composite"
@@ -42,7 +42,7 @@ runs:
     - name: build.container
       uses: ./exodigo-containers-actions/build-container
       with:
-        container_name: ${{ inputs.container_name }}
+        container_alias: ${{ inputs.container_alias }}
         tag_names: ${{ inputs.artifact_version }} ${{ inputs.version_y_stream }}
         container_input: |
           OCI_ARG_NAME="--build-arg=ARTIFACT_NAME=${{ inputs.artifact_name }}"

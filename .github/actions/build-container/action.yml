@@ -2,11 +2,11 @@ name: 'build-container'
 description: 'Build and publish a basic container'
 
 inputs:
-  container_name:
-    description: The name of the container
+  container_alias:
+    description: The alias of the container
     required: true
-  tag_names:
-    description: Tag names to generate tags for
+  tags:
+    description: Tags to generate container names for
     default: ""
   container_file:
     description: Name of the file to use for build
@@ -24,9 +24,9 @@ outputs:
   container:
     description: The created container
     value: ${{ steps.build.outputs.container }}
-  tags:
-    description: Additional tags created for the container
-    value: ${{ steps.tags.outputs.tags }}
+  container_names:
+    description: Additional names created for the container
+    value: ${{ steps.names.outputs.container_names }}
 
 runs:
   using: "composite"
@@ -39,12 +39,12 @@ runs:
           ln -sfn "${{ github.action_path }}/.." "${action_repo}"
         fi
 
-    - name: generate.tags
-      id: tags
-      uses: ./exodigo-containers-actions/generate-tags
+    - name: generate.names
+      id: names
+      uses: ./exodigo-containers-actions/generate-container-names
       with:
-        container_name: ${{ inputs.container_name }}
-        tag_names: ${{ inputs.tag_names }}
+        container_alias: ${{ inputs.container_alias }}
+        tags: ${{ inputs.tags }}
 
     - name: container.build
       id: build
@@ -65,20 +65,20 @@ runs:
         container=${container}
         __EOF__
 
-    - name: prepare.final.tags
+    - name: prepare.final.names
       id: prepare
       shell: sh
       run: |
-        tags="${{ steps.build.outputs.container }}"
+        container_names="${{ steps.build.outputs.container }}"
         if [ "${{ inputs.publish}}" = "true" ]; then
-          tags="${tags} ${{ steps.tags.outputs.tags }}"
+          container_names="${container_names} ${{ steps.names.outputs.container_names }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        final_tags=${tags}
+        final_container_names=${final_container_names}
         __EOF__
 
     - name: container.publish.all
       uses: ./exodigo-containers-actions/push-container
       with:
         container: ${{ steps.build.outputs.container }}
-        tags: ${{ steps.prepare.outputs.final_tags }}
+        container_names: ${{ steps.prepare.outputs.final_container_names }}

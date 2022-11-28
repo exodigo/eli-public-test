@@ -1,0 +1,30 @@
+name: 'generate-container-names'
+description: 'Generate full container names for later usage'
+
+inputs:
+  container_alias:
+    description: The alias of the container
+    required: true
+  tags:
+    description: Tags to generate container names for
+    default: ""
+outputs:
+  container_names:
+    description: The generated container names
+    value: ${{ steps.names.outputs.container_names }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: set.names
+      id: names
+      shell: sh
+      run: |
+        if [ -z "${{ inputs.tags}}" ]; then
+          container_names=""
+        else
+          container_names="$(printf "${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${{ inputs.container_alias }}:%s " ${{ inputs.tags }})"
+        fi
+        cat >> "${GITHUB_OUTPUT}" << __EOF__
+        container_names=${container_names}
+        __EOF__

@@ -1,12 +1,12 @@
 name: 'push-container'
-description: 'Add tags to a given container and publish them'
+description: 'Add container names to a given container and publish them'
 
 inputs:
   container:
     description: The container to publish
     required: true
-  tags:
-    description: The tags to add for the container
+  container_names:
+    description: The container names to add for the container
     default: ""
 
 runs:
@@ -18,7 +18,7 @@ runs:
       if ! ${OCI_ENGINE} image exists "${{ inputs.container }}"; then
         ${OCI_ENGINE} image pull "${{ inputs.container }}"
       fi
-      for t in ${{ inputs.tags }}; do
-        ${OCI_ENGINE} image tag "${{ inputs.container }}" "${t}"
-        ${OCI_ENGINE} image push "${t}"
+      for name in ${{ inputs.container_names }}; do
+        ${OCI_ENGINE} image tag "${{ inputs.container }}" "${name}"
+        ${OCI_ENGINE} image push "${name}"
       done
