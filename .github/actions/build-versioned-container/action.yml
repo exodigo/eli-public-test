@@ -52,6 +52,7 @@ runs:
         __EOF__
 
     - name: build.container
+      id: build
       uses: ./exodigo-containers-actions/build-container
       with:
         container_name: ${{ inputs.container_name }}
