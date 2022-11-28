@@ -21,12 +21,12 @@ inputs:
     description: Whether or not to publish the container (The temporary container name is published regardless)
     default: "true"
 outputs:
-  container:
-    description: The created container
-    value: ${{ steps.build.outputs.container }}
-  container_names:
+  container_name:
+    description: The name of the created container
+    value: ${{ steps.build.outputs.container_name }}
+  public_container_names:
     description: Additional names created for the container
-    value: ${{ steps.build.outputs.container_names }}
+    value: ${{ steps.build.outputs.public_container_names }}
 
 runs:
   using: "composite"

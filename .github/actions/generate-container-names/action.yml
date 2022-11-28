@@ -9,9 +9,9 @@ inputs:
     description: Tags to generate container names for
     default: ""
 outputs:
-  container_names:
+  public_container_names:
     description: The generated container names
-    value: ${{ steps.names.outputs.container_names }}
+    value: ${{ steps.names.outputs.public_container_names }}
 
 runs:
   using: "composite"
@@ -21,10 +21,10 @@ runs:
       shell: sh
       run: |
         if [ -z "${{ inputs.tags}}" ]; then
-          container_names=""
+          public_container_names=""
         else
-          container_names="$(printf "${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${{ inputs.container_alias }}:%s " ${{ inputs.tags }})"
+          public_container_names="$(printf "${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${{ inputs.container_alias }}:%s " ${{ inputs.tags }})"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        container_names=${container_names}
+        public_container_names=${public_container_names}
         __EOF__

@@ -5,7 +5,7 @@ inputs:
   container:
     description: The container to publish
     required: true
-  container_names:
+  public_container_names:
     description: The container names to add for the container
     default: ""
 
@@ -18,7 +18,7 @@ runs:
       if ! ${OCI_ENGINE} image exists "${{ inputs.container }}"; then
         ${OCI_ENGINE} image pull "${{ inputs.container }}"
       fi
-      for name in ${{ inputs.container_names }}; do
+      for name in ${{ inputs.public_container_names }}; do
         ${OCI_ENGINE} image tag "${{ inputs.container }}" "${name}"
         ${OCI_ENGINE} image push "${name}"
       done

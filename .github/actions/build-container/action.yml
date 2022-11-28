@@ -21,12 +21,12 @@ inputs:
     description: Whether or not to publish the container (The temporary tag is published regardless)
     default: "true"
 outputs:
-  container:
-    description: The created container
-    value: ${{ steps.build.outputs.container }}
-  container_names:
+  container_name:
+    description: The name of the created container
+    value: ${{ steps.build.outputs.container_name }}
+  public_container_names:
     description: Additional names created for the container
-    value: ${{ steps.names.outputs.container_names }}
+    value: ${{ steps.names.outputs.public_container_names }}
 
 runs:
   using: "composite"
@@ -46,15 +46,15 @@ runs:
       env:
         OCI_CONTAINER_FILE: ${{ inputs.container_file }}
       run: |
-        container="${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${AWS_ECR_CI_TEMPORARY_REPOSITORY}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}-$(date -u +%s)"
+        container_name="${AWS_ECR_NAME}/${AWS_ECR_CI_REPOSITORY_NAME}/${AWS_ECR_CI_TEMPORARY_REPOSITORY}:temp-${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}-$(date -u +%s)"
         eval "${{ inputs.container_input }}"
-        OCI_ARG_LOCAL_TAG="--tag=${container}"
+        OCI_ARG_LOCAL_TAG="--tag=${container_name}"
         for x in $(set | sed -n -e 's/^\(OCI_ARG_[^=]*\)=.*/\1/ p'); do
           eval "export ${x}"
         done
         "${{ github.action_path }}/build-container.sh"
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        container=${container}
+        container_name=${container_name}
         __EOF__
 
     - name: generate.names
@@ -68,16 +68,16 @@ runs:
       id: final_names
       shell: sh
       run: |
-        final_container_names="${{ steps.build.outputs.container }}"
+        final_public_container_names="${{ steps.build.outputs.container }}"
         if [ "${{ inputs.publish }}" = "true" ]; then
-          final_container_names="${final_container_names} ${{ steps.names.outputs.container_names }}"
+          final_public_container_names="${final_public_container_names} ${{ steps.names.outputs.public_container_names }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
-        final_container_names=${final_container_names}
+        final_public_container_names=${final_public_container_names}
         __EOF__
 
     - name: container.publish.all
       uses: ./exodigo-containers-actions/push-container
       with:
         container: ${{ steps.build.outputs.container }}
-        container_names: ${{ steps.final_names.outputs.final_container_names }}
+        public_container_names: ${{ steps.final_names.outputs.final_public_container_names }}

@@ -18,9 +18,9 @@ outputs:
   container:
     description: The created container
     value: ${{ steps.build.outputs.container }}
-  container_names:
+  public_container_names:
     description: Additional names created for the container
-    value: ${{ steps.build.outputs.container_names }}
+    value: ${{ steps.build.outputs.public_container_names }}
 
 runs:
   using: "composite"
