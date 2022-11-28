@@ -39,13 +39,6 @@ runs:
           ln -sfn "${{ github.action_path }}/.." "${action_repo}"
         fi
 
-    - name: generate.names
-      id: names
-      uses: ./exodigo-containers-actions/generate-container-names
-      with:
-        container_alias: ${{ inputs.container_alias }}
-        tags: ${{ inputs.tags }}
-
     - name: container.build
       id: build
       shell: sh
@@ -64,13 +57,20 @@ runs:
         container=${container}
         __EOF__
 
+    - name: generate.names
+      id: names
+      uses: ./exodigo-containers-actions/generate-container-names
+      with:
+        container_alias: ${{ inputs.container_alias }}
+        tags: ${{ inputs.tags }}
+
     - name: prepare.final.names
-      id: prepare
+      id: final_names
       shell: sh
       run: |
-        container_names="${{ steps.build.outputs.container }}"
-        if [ "${{ inputs.publish}}" = "true" ]; then
-          container_names="${container_names} ${{ steps.names.outputs.container_names }}"
+        final_container_names="${{ steps.build.outputs.container }}"
+        if [ "${{ inputs.publish }}" = "true" ]; then
+          final_container_names="${final_container_names} ${{ steps.names.outputs.container_names }}"
         fi
         cat >> "${GITHUB_OUTPUT}" << __EOF__
         final_container_names=${final_container_names}
@@ -80,4 +80,4 @@ runs:
       uses: ./exodigo-containers-actions/push-container
       with:
         container: ${{ steps.build.outputs.container }}
-        container_names: ${{ steps.prepare.outputs.final_container_names }}
+        container_names: ${{ steps.final_names.outputs.final_container_names }}
