@@ -35,7 +35,7 @@ runs:
 
     - name: env.version
       id: version
-      uses: exodigo/exodigo_ci_common/actions/gen-version@test
+      uses: exodigo/exodigo_ci_common/actions/gen-version@s1
       with:
         working-directory: ${{ inputs.working-directory }}
 

@@ -3,6 +3,13 @@
 OCI_ENGINE="${OCI_ENGINE:-podman}"
 OCI_CONTAINER_FILE="${OCI_CONTAINER_FILE:-Containerfile}"
 
+if [ -d .github/build-container-custom ]; then
+  find .github/build-container-custom -type f -executable | sort | while read s; do
+    echo "Executing: '${s}'"
+    "${s}"
+  done
+fi
+
 eval "set -- "$(set | sed -n -e 's/^OCI_ARG_[^=]*=// p')""
 exec ${OCI_ENGINE} image build \
   --secret id=pip_secret,src="${HOME}/.config/pip/pip.conf" \

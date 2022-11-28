@@ -13,7 +13,7 @@ runs:
   steps:
     - name: config.env
       if: ${{ env.CI_CONTAINER_ENV_SET }} != "true"
-      uses: exodigo/exodigo_ci_common/actions/ci-env@test
+      uses: exodigo/exodigo_ci_common/actions/ci-env@s1
       with:
         working-directory: ${{ inputs.working-directory }}
         secrets: ${{ inputs.secrets }}
