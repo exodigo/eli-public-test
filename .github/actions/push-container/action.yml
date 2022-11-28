@@ -2,7 +2,7 @@ name: 'push-container'
 description: 'Add container names to a given container and publish them'
 
 inputs:
-  container:
+  container_name:
     description: The container to publish
     required: true
   public_container_names:
@@ -15,10 +15,10 @@ runs:
   - name: container.publish
     shell: sh
     run: |
-      if ! ${OCI_ENGINE} image exists "${{ inputs.container }}"; then
-        ${OCI_ENGINE} image pull "${{ inputs.container }}"
+      if ! ${OCI_ENGINE} image exists "${{ inputs.container_name }}"; then
+        ${OCI_ENGINE} image pull "${{ inputs.container_name }}"
       fi
       for name in ${{ inputs.public_container_names }}; do
-        ${OCI_ENGINE} image tag "${{ inputs.container }}" "${name}"
+        ${OCI_ENGINE} image tag "${{ inputs.container_name }}" "${name}"
         ${OCI_ENGINE} image push "${name}"
       done
